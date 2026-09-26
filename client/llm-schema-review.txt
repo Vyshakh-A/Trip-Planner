@@ -1,0 +1,109 @@
+FLAM LLM SCHEMA REVIEW
+=======================
+
+1. CURRENT STRUCTURED-OUTPUT SCHEMA
+
+The object passed to generationConfig.responseSchema in api/generate.js is:
+
+const itinerarySchema = {
+  type: "OBJECT",
+  properties: {
+    tripTitle: { type: "STRING" },
+    days: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          label: { type: "STRING" },
+          stops: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: {
+                name: { type: "STRING" },
+                category: {
+                  type: "STRING",
+                  enum: [
+                    "sightseeing",
+                    "food",
+                    "transport",
+                    "lodging",
+                    "activity",
+                    "rest",
+                    "other",
+                  ],
+                },
+                time: { type: "STRING", nullable: true },
+                durationMinutes: { type: "NUMBER", nullable: true },
+                description: { type: "STRING" },
+                location: { type: "STRING", nullable: true },
+              },
+              required: [
+                "name",
+                "category",
+                "time",
+                "durationMinutes",
+                "description",
+                "location",
+              ],
+            },
+          },
+        },
+        required: ["label", "stops"],
+      },
+    },
+  },
+  required: ["tripTitle", "days"],
+};
+
+2. ADDITIONAL PROPERTIES CHECK
+
+additionalProperties: false is currently missing at all object levels:
+
+- Top-level itinerary object: missing
+- Day object: missing
+- Stop object: missing
+
+additionalProperties: false means an object may contain only properties explicitly
+listed in its properties definition. At the stop level, it prevents provider output
+from including fields such as id or dayIndex.
+
+This setting constrains the structured-output response. It does not generate IDs,
+remove fields after generation, or replace client-side validation.
+
+3. PROMPT CHECK
+
+The prompt currently contains:
+
+Do not include prose, markdown, commentary, IDs, or dayIndex fields.
+
+This does not ask the model to generate IDs, but it mentions identifier-related
+fields. Since IDs and dayIndex are client-side concerns, this wording should be
+removed from the prompt after the approach is confirmed.
+
+4. CURRENT VALIDATION BEHAVIOR
+
+validateResult.js reconstructs the top-level object, each day, and each stop using
+only the allowed fields. An unexpected field such as this:
+
+"id": "provider-generated-uuid"
+
+is not rejected and is not passed through. It is silently dropped.
+
+5. RECOMMENDED APPROACH
+
+Keep stripping unknown fields in validateResult.js and add
+additionalProperties: false at the top-level, day-level, and stop-level schema.
+
+Reasons:
+
+- The provider schema blocks extra fields during normal structured generation.
+- The validator remains a defensive boundary if the provider violates the schema.
+- A valid stop remains usable when harmless metadata is present.
+- Provider-generated IDs cannot reach the UI because the validator removes them.
+- App.jsx then generates the client-side ID with crypto.randomUUID().
+
+Rejecting the entire response would be stricter, but would turn recoverable provider
+drift into a full retry or error. Stripping is the better fit for this ID case.
+
+
