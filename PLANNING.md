@@ -6,6 +6,10 @@
 
 This doc is a working planning reference — questions we asked ourselves before writing code, and the decision made for each, with the reasoning. Update it as decisions change.
 
+**AI tools & roles**
+- Claude was used for planning and QA throughout the project.
+- GitHub Copilot was used for debugging issues and errors, and for writing this document.
+
 ---
 
 ## 1. How do we get input without this looking like a chatbot?
@@ -129,6 +133,8 @@ This doc is a working planning reference — questions we asked ourselves before
 
 **Validation rules (`validateResult.ts`):** `days` non-empty array; each day's `stops` is an array (empty allowed — a rest day is valid, don't fail on it); `name`/`description` non-empty strings; `category` in the fixed enum (reject or coerce to `other`); `time` matches `HH:MM` or is `null`; `durationMinutes` positive number or `null`.
 
+**Empirical finding (tested against gemini-3.6-flash, real generation calls):** `additionalProperties: false`, correctly set at all three schema levels in proper JSON Schema format, does NOT reliably block extra fields — the model still emitted `id` on every stop despite the schema saying it shouldn't. Required fields, types, and enum values were all correctly enforced; only the "no extra fields" guarantee failed to hold. Conclusion: `additionalProperties: false` is kept in the schema (harmless, may help on other providers) but is not relied on. `validateResult.ts`'s allowlist-reconstruction (strip unknown fields) is the actual enforcement layer for this, not a defensive backstop on top of a working schema constraint. This is the accurate story to give if asked why validation still strips fields the schema was "supposed to" prevent.
+
 ## 9. Serverless function vs. small Express server
 
 **Decision: serverless function (Vercel/Netlify), not standalone Express.**
@@ -153,6 +159,6 @@ Manual retry after that point is unlimited.
 
 ## Still open / to decide before coding
 
-- [/] Exact wording of the master prompt (schema description + example + strict-JSON instruction)
-- [/] Whether "Suggest a stop" category picker ships in the core submission or as a stretch
-- [/] Time-string format edge cases (multi-day spans, overnight stops crossing midnight)
+- [ ] Exact wording of the master prompt (schema description + example + strict-JSON instruction)
+- [ ] Whether "Suggest a stop" category picker ships in the core submission or as a stretch
+- [ ] Time-string format edge cases (multi-day spans, overnight stops crossing midnight)
