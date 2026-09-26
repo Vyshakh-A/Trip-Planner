@@ -80,7 +80,7 @@ Use `client` as the Vercel project root. Set `GEMINI_API_KEY` in the project's e
 
 ## Planning & design decisions
 
-See [`../PLANNING.md`](../PLANNING.md) for the design questions considered before writing code — input UX vs. chatbot behavior, prompt/schema consistency, the manual-vs-AI stop decision, the JSON schema, and the retry policy, including the tested finding that `additionalProperties: false` doesn't reliably hold on gemini-3.6-flash.
+See [`./PLANNING.md`](./PLANNING.md) for the design questions considered before writing code — input UX vs. chatbot behavior, prompt/schema consistency, the manual-vs-AI stop decision, the JSON schema, and the retry policy, including the tested finding that `additionalProperties: false` doesn't reliably hold on gemini-3.6-flash.
 
 ## AI assistance
 

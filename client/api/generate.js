@@ -19,7 +19,6 @@ function getApiKey() {
 
 const itinerarySchema = {
   type: "object",
-  // Tested against gemini-3.6-flash: this does not reliably block extra fields on this model; validateResult.js's strip logic is the actual enforcement layer, not this. Applies to the nested day and stop objects too.
   additionalProperties: false,
   properties: {
     tripTitle: { type: "string" },
