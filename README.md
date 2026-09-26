@@ -90,5 +90,5 @@ See [`./PLANNING.md`](./PLANNING.md) for the design questions considered before 
 ## Time Spent
 - Planning (core foundation): ~1 hour
 - UI: ~1 hours
-- Development: 3+ hours
+- Development: 4+ hours
 - Debugging: 2+ hours
