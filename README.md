@@ -86,3 +86,9 @@ See [`./PLANNING.md`](./PLANNING.md) for the design questions considered before 
 
 - Claude was used for planning and QA throughout the project.
 - GitHub Copilot was used for debugging issues and errors, and for writing this document.
+
+## Time Spent
+- Planning (core foundation): ~1 hour
+- UI: ~1.5 hours
+- Development: 3+ hours
+- Debugging: 2+ hours
